@@ -1,0 +1,17 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+fastapi = "==0.88"
+uvicorn = "==0.20"
+prometheus-fastapi-instrumentator = "*"
+
+[dev-packages]
+pytest = "==7.2.0"
+httpx = "*"
+pytest-cov = "==4.0.0"
+
+[requires]
+python_version = "3.8"

@@ -1,0 +1,43 @@
+version: "3.9"
+services:
+  runner_local:
+    build:
+      context: .
+      dockerfile: DockerfileDev
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./src:/app/src/
+      - ./main.py:/app/main.py:ro
+      - ./.coveragerc:/app/.coveragerc:ro
+      - ./tests:/app/tests/
+      - ./scripts:/app/scripts:ro
+    command: bash ./scripts/run_local_app.sh
+  runner:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    command: bash ./scripts/run_app.sh
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    restart: unless-stopped
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    expose:
+      - 9090
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - 3000:3000
+    restart: unless-stopped
+    depends_on:
+      - prometheus

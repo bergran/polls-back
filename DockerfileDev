@@ -1,0 +1,25 @@
+FROM python:3.10.9-slim-bullseye as builder
+
+WORKDIR /builds
+
+RUN pip install pipenv
+
+COPY ./Pipfile /builds
+COPY ./Pipfile.lock /builds
+
+RUN pipenv requirements --dev > requirements.txt
+
+FROM python:3.10.9-slim-bullseye as runner
+
+WORKDIR /app
+
+COPY --from=builder /builds/requirements.txt /app
+COPY ./src /app/
+COPY ./.coveragerc /app/
+COPY ./main.py /app
+COPY ./tests /app/tests/
+COPY ./scripts/ /app/scripts
+
+RUN pwd && ls && pip install -r ./requirements.txt
+
+CMD ["bash", "./scripts/run_local_app.sh"]
